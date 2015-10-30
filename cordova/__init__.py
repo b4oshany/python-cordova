@@ -27,18 +27,20 @@ BUILD_LOCATION = {
 class App(object):
     path = None
     name = None
+    debug = False
 
     # We need to initialize the application with the path of the root
     # of the project
-    def __init__(self, path, name, *args, **kwargs):
+    def __init__(self, path, name, debug=False, *args, **kwargs):
         self.path = path
         self.name = name
+        self.debug = debug
         super(App, self).__init__(*args, **kwargs)
 
     def __platform_list(self):
         platform_ls_output = subprocess.check_output([
             'cordova', 'platform', 'ls'
-        ]).splitlines()
+        ], shell=self.debug).splitlines()
 
         installed = re.findall(r'[,:]\s(\w+)\s\d+', platform_ls_output[0])
         available = re.findall(r'[,:]\s(\w+)\s', platform_ls_output[1])
@@ -54,7 +56,7 @@ class App(object):
     def add_platform(self, platform):
         return_code = subprocess.call([
             'cordova', 'platform', 'add', platform
-        ])
+        ], shell=self.debug)
 
         if return_code == 0:
             return True
@@ -64,7 +66,7 @@ class App(object):
     def remove_platform(self, platform):
         return_code = subprocess.call([
             'cordova', 'platform', 'remove', platform
-        ])
+        ], shell=self.debug)
 
         if return_code == 0:
             return True
@@ -78,7 +80,7 @@ class App(object):
             '%s-%s.zip' % (
                 self.name, platform
             ), platform
-        ])
+        ], shell=self.debug)
 
         if return_code == 0:
             return '%s/%s-%s.zip' % (
@@ -93,7 +95,7 @@ class App(object):
         if release:
             cmd_params.append('--release')
 
-        return_code = subprocess.call(cmd_params)
+        return_code = subprocess.call(cmd_params, shell=self.debug)
 
         if return_code == 0:
             return [os.path.join(
@@ -109,7 +111,7 @@ class App(object):
     def prepare(self, platform):
         return_code = subprocess.call([
             'cordova', 'prepare', platform
-        ])
+        ], shell=self.debug)
 
         if return_code == 0:
             return True
@@ -119,7 +121,7 @@ class App(object):
     def compile(self, platform):
         return_code = subprocess.call([
             'cordova', 'compile', platform
-        ])
+        ], shell=self.debug)
 
         if return_code == 0:
             return True
